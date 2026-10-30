@@ -1949,6 +1949,286 @@ body {
  .section{padding:84px 0}
 }
 @media(min-width:1280px){.section--dark,.section--impact{padding:80px 64px}}
+
+/* ===== Salvapantallas: recorrido automático de secciones ===== */
+.sv {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  background:
+    radial-gradient(70% 60% at 85% 0%, rgba(127, 220, 138, 0.3), transparent 70%),
+    radial-gradient(60% 60% at 0% 100%, rgba(23, 147, 90, 0.35), transparent 70%),
+    var(--grad-noche);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 500ms ease, visibility 500ms ease;
+}
+
+.sv.is-on {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+body.sv-lock {
+  overflow: hidden;
+}
+
+.sv-stage {
+  position: relative;
+  min-height: 0;
+}
+
+.sv-slide {
+  position: absolute;
+  inset: clamp(12px, 3vh, 36px) clamp(12px, 3vw, 48px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(18px, 3vw, 52px);
+  overflow: hidden;
+  background: var(--papel);
+  border-radius: 20px;
+  box-shadow: 0 40px 100px -50px rgba(0, 0, 0, 0.9);
+  color: var(--tinta);
+  opacity: 0;
+  transform: translateY(34px) scale(0.985);
+  transition: opacity 420ms cubic-bezier(0.23, 1, 0.32, 1), transform 620ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.sv-slide.is-active {
+  opacity: 1;
+  transform: none;
+  transition-duration: 700ms;
+  transition-delay: 160ms;
+}
+
+.sv-slide.is-out {
+  opacity: 0;
+  transform: translateY(-28px) scale(1.01);
+  transition-delay: 0ms;
+}
+
+.sv-scaler {
+  width: 100%;
+  transform-origin: center center;
+}
+
+.sv-content {
+  width: 100%;
+}
+
+/* Los bloques de la página se reacomodan dentro de la diapositiva */
+.sv-content .wrap {
+  max-width: none;
+  margin: 0;
+  padding: 0;
+}
+
+.sv-content .hero,
+.sv-content .section,
+.sv-content .site-footer {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--tinta);
+}
+
+.sv-content .hero-grid {
+  display: block;
+}
+
+.sv-content .hero-visual {
+  max-width: 720px;
+  margin: 24px auto 0;
+}
+
+.sv-content .hero-lead {
+  margin-top: 14px;
+}
+
+.sv-content .scroll-cue {
+  display: none;
+}
+
+.sv-content .fact-strip {
+  padding: 24px clamp(16px, 2.4vw, 32px);
+  border-radius: 16px;
+}
+
+.sv-content .section--dark {
+  padding: clamp(18px, 2.6vw, 44px);
+  border-radius: 16px;
+  background: var(--grad-noche);
+  color: var(--papel);
+}
+
+.sv-content .section--impact {
+  padding: clamp(18px, 2.6vw, 44px);
+  border-radius: 16px;
+  background: linear-gradient(135deg, #e1f4e8 0%, #c6ead3 100%);
+}
+
+.sv-content .section--dark .section-meta,
+.sv-content .section--dark .lead,
+.sv-content .section--dark .tile p {
+  color: var(--texto-claro-suave);
+}
+
+.sv-content .site-footer .closing {
+  padding-bottom: 22px;
+  border-bottom-color: var(--linea);
+}
+
+.sv-content .site-footer .closing-copy,
+.sv-content .site-footer .closing h2 {
+  color: var(--tinta);
+}
+
+.sv-content .site-footer .closing-kicker,
+.sv-content .site-footer .footer-label {
+  color: var(--verde);
+}
+
+.sv-content .site-footer .lead,
+.sv-content .site-footer .closing-note,
+.sv-content .site-footer .footer-block p:last-child,
+.sv-content .site-footer .footer-base {
+  color: var(--tinta-suave);
+}
+
+.sv-content .site-footer .footer-info {
+  padding-top: 22px;
+  padding-bottom: 6px;
+  border-bottom-color: var(--linea);
+}
+
+.sv-content .site-footer .footer-base {
+  padding-top: 12px;
+  padding-bottom: 0;
+}
+
+.sv-content .site-footer .footer-base a {
+  color: var(--tinta);
+}
+
+/* Aparición escalonada del contenido de cada diapositiva */
+.sv-content .reveal {
+  transition-delay: var(--sv-delay, 0ms);
+}
+
+.sv-content.sv-play .reveal {
+  opacity: 1;
+  transform: none;
+}
+
+.sv-item {
+  opacity: 0;
+}
+
+.sv-content.sv-play .sv-item {
+  animation: sv-rise 800ms cubic-bezier(0.23, 1, 0.32, 1) both;
+  animation-delay: var(--sv-delay, 0ms);
+}
+
+@keyframes sv-rise {
+  from {
+    opacity: 0;
+    transform: translateY(22px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Indicadores */
+.sv-hud {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 0 clamp(16px, 3vw, 40px) clamp(12px, 2.2vh, 22px);
+  font-size: 0.6875rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--texto-claro-suave);
+}
+
+.sv-brand {
+  font-family: var(--fuente-display);
+  font-size: 1rem;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  text-transform: none;
+  color: var(--blanco);
+}
+
+.sv-brand span {
+  color: var(--lima);
+}
+
+.sv-dots {
+  display: flex;
+  gap: 6px;
+  margin-inline: auto;
+}
+
+.sv-dots i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(220, 245, 230, 0.28);
+  transition: background-color 300ms, transform 300ms;
+}
+
+.sv-dots i.is-on {
+  background: var(--lima);
+  transform: scale(1.5);
+}
+
+.sv-hint {
+  text-align: right;
+}
+
+.sv-progress {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 3px;
+  background: rgba(220, 245, 230, 0.14);
+}
+
+.sv-progress i {
+  display: block;
+  width: 0;
+  height: 100%;
+  background: linear-gradient(90deg, #7fdc8a, var(--lima));
+}
+
+.sv-progress i.is-run {
+  animation: sv-bar var(--sv-dur, 9000ms) linear both;
+}
+
+@keyframes sv-bar {
+  from { width: 0; }
+  to { width: 100%; }
+}
+
+@media (max-width: 640px) {
+  .sv-hint {
+    display: none;
+  }
+
+  .sv-dots {
+    margin-left: auto;
+    margin-right: 0;
+  }
+}
 </style>
 </head>
 <body>
@@ -2381,6 +2661,230 @@ body {
   }
 })();
 
+</script>
+<script>
+/* ===== Salvapantallas: tras 25 s sin interacción recorre las secciones ===== */
+(() => {
+  "use strict";
+
+  const IDLE_MS = 25000;
+  const SLIDE_MS = 9000;
+
+  let overlay = null;
+  let dots = null;
+  let bar = null;
+  const slides = [];
+  let index = -1;
+  let active = false;
+  let slideTimer = 0;
+  let activatedAt = 0;
+  let lastActivity = Date.now();
+
+  const query = (selector, root = document) => root.querySelector(selector);
+
+  function sources() {
+    const list = [];
+    const hero = query(".hero");
+    const facts = query(".fact-strip");
+    if (hero) list.push(hero);
+    if (facts) list.push(facts);
+    document.querySelectorAll(".dossier-body > .section").forEach((node) => list.push(node));
+    const footer = query(".site-footer");
+    if (footer) list.push(footer);
+    return list;
+  }
+
+  function build() {
+    if (overlay) return;
+
+    overlay = document.createElement("div");
+    overlay.className = "sv";
+    overlay.setAttribute("aria-hidden", "true");
+    overlay.innerHTML =
+      '<div class="sv-stage"></div>' +
+      '<div class="sv-hud">' +
+        '<span class="sv-brand">migarita<span>.</span></span>' +
+        '<span class="sv-dots" aria-hidden="true"></span>' +
+        '<span class="sv-hint">Toca la pantalla o mueve el mouse para volver</span>' +
+      "</div>" +
+      '<div class="sv-progress"><i></i></div>';
+
+    const stage = query(".sv-stage", overlay);
+    dots = query(".sv-dots", overlay);
+    bar = query(".sv-progress i", overlay);
+
+    sources().forEach((node) => {
+      const slide = document.createElement("article");
+      slide.className = "sv-slide";
+      slide.setAttribute("aria-hidden", "true");
+
+      const scaler = document.createElement("div");
+      scaler.className = "sv-scaler";
+
+      const content = document.createElement("div");
+      content.className = "sv-content";
+
+      const clone = node.cloneNode(true);
+      clone.querySelectorAll("[id]").forEach((el) => el.removeAttribute("id"));
+      clone.querySelectorAll("[aria-labelledby]").forEach((el) => el.removeAttribute("aria-labelledby"));
+      clone.querySelectorAll(".is-in").forEach((el) => el.classList.remove("is-in"));
+
+      content.appendChild(clone);
+      scaler.appendChild(content);
+      slide.appendChild(scaler);
+      stage.appendChild(slide);
+
+      slides.push({ slide, content, scaler });
+      dots.insertAdjacentHTML("beforeend", "<i></i>");
+    });
+
+    overlay.addEventListener("pointerdown", (event) => event.preventDefault());
+
+    document.body.appendChild(overlay);
+  }
+
+  /* Ajusta la diapositiva para que el contenido quepa completo en pantalla */
+  function fit(item) {
+    const style = getComputedStyle(item.slide);
+    const padX = parseFloat(style.paddingLeft) + parseFloat(style.paddingRight);
+    const padY = parseFloat(style.paddingTop) + parseFloat(style.paddingBottom);
+    const width = Math.max(160, item.slide.clientWidth - padX);
+    const height = Math.max(160, item.slide.clientHeight - padY);
+
+    item.scaler.style.transform = "none";
+    item.scaler.style.width = width + "px";
+    item.content.style.width = "100%";
+
+    let scale = Math.min(1.3, height / Math.max(item.content.scrollHeight, 1));
+    if (scale > 1) {
+      item.scaler.style.width = Math.max(160, Math.round(width / scale)) + "px";
+      scale = Math.min(scale, height / Math.max(item.content.scrollHeight, 1));
+    }
+
+    item.scaler.style.transform = "scale(" + scale + ")";
+  }
+
+  /* Entrada animada del contenido: usa los .reveal existentes o los bloques principales */
+  function play(item) {
+    const reveals = Array.from(item.content.querySelectorAll(".reveal"));
+    let targets = reveals;
+
+    if (!reveals.length) {
+      targets = Array.from(
+        item.content.querySelectorAll(
+          ".hero-copy > *, .hero-panel > *, .fact-grid > .fact, .closing > *, .footer-info > *, .footer-base > *"
+        )
+      );
+      targets.forEach((el) => el.classList.add("sv-item"));
+    }
+
+    targets.forEach((el, i) => {
+      el.style.setProperty("--sv-delay", Math.min(i * 90, 1100) + "ms");
+    });
+
+    item.content.classList.remove("sv-play");
+    void item.content.offsetWidth;
+    item.content.classList.add("sv-play");
+  }
+
+  function runBar() {
+    bar.style.setProperty("--sv-dur", SLIDE_MS + "ms");
+    bar.classList.remove("is-run");
+    void bar.offsetWidth;
+    bar.classList.add("is-run");
+  }
+
+  function updateDots() {
+    Array.from(dots.children).forEach((dot, i) => {
+      dot.classList.toggle("is-on", i === index);
+    });
+  }
+
+  function show(next) {
+    const item = slides[next];
+    if (!item) return;
+
+    const prev = slides[index];
+    if (prev && prev !== item) {
+      prev.slide.classList.remove("is-active");
+      prev.slide.classList.add("is-out");
+      prev.slide.setAttribute("aria-hidden", "true");
+    }
+
+    item.slide.classList.remove("is-out");
+    item.slide.classList.add("is-active");
+    item.slide.setAttribute("aria-hidden", "false");
+    index = next;
+
+    fit(item);
+    play(item);
+    updateDots();
+    runBar();
+
+    clearTimeout(slideTimer);
+    slideTimer = setTimeout(() => {
+      if (active) show((index + 1) % slides.length);
+    }, SLIDE_MS);
+  }
+
+  function enter() {
+    if (active) return;
+    build();
+
+    const menu = document.getElementById("menu");
+    if (menu && menu.open) menu.close();
+
+    active = true;
+    activatedAt = Date.now();
+    index = -1;
+    slides.forEach((item) => item.slide.classList.remove("is-active", "is-out"));
+
+    overlay.classList.add("is-on");
+    overlay.setAttribute("aria-hidden", "false");
+    document.body.classList.add("sv-lock");
+
+    show(0);
+  }
+
+  function exit() {
+    if (!active) return;
+    active = false;
+    clearTimeout(slideTimer);
+
+    overlay.classList.remove("is-on");
+    overlay.setAttribute("aria-hidden", "true");
+    document.body.classList.remove("sv-lock");
+
+    lastActivity = Date.now();
+  }
+
+  const ACTIVITY = ["pointerdown", "pointermove", "touchstart", "touchmove", "keydown", "wheel", "scroll"];
+
+  function onActivity(event) {
+    lastActivity = Date.now();
+    if (!active) return;
+
+    const soft = event.type === "pointermove" || event.type === "touchmove" || event.type === "wheel" || event.type === "scroll";
+    if (soft && Date.now() - activatedAt < 900) return;
+
+    exit();
+  }
+
+  ACTIVITY.forEach((type) => window.addEventListener(type, onActivity, { passive: true }));
+
+  setInterval(() => {
+    if (!active && !document.hidden && Date.now() - lastActivity >= IDLE_MS) enter();
+  }, 1000);
+
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) exit();
+    lastActivity = Date.now();
+  });
+
+  window.addEventListener("resize", () => {
+    if (active && slides[index]) fit(slides[index]);
+  });
+})();
 </script>
 </body>
 </html>
